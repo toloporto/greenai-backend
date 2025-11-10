@@ -7,28 +7,35 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let pool;
-try {
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
-  console.log("DB connected successfully");
-} catch (e) {
-  console.error("DB Connection failed:", e.message);
-}
+// CONEXIÓN A POSTGRESQL (Railway)
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
+// PRUEBA DE CONEXIÓN
+pool.connect((err) => {
+  if (err) {
+    console.error("DB Connection failed:", err.message);
+  } else {
+    console.log("DB connected successfully");
+  }
+});
+
+// RUTA RAÍZ
 app.get("/", (req, res) => {
   res.json({ 
     message: "GreenAI Backend EN VIVO!",
-    dbConnected: !!pool,
+    db: "PostgreSQL en Railway",
     api: "/api/zones",
     port: process.env.PORT || 4000
   });
 });
 
+// CREAR TABLA Y OBTENER ZONAS
 app.get("/api/zones", async (req, res) => {
-  if (!pool) return res.status(503).json({ error: "DB not connected" });
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS zones (
@@ -47,8 +54,8 @@ app.get("/api/zones", async (req, res) => {
   }
 });
 
+// AÑADIR ZONA
 app.post("/api/zones", async (req, res) => {
-  if (!pool) return res.status(503).json({ error: "DB not connected" });
   const { name } = req.body;
   if (!name) return res.status(400).json({ error: "name required" });
   try {
@@ -63,7 +70,8 @@ app.post("/api/zones", async (req, res) => {
   }
 });
 
+// PUERTO DINÁMICO (RAILWAY)
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Backend en puerto ${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend corriendo en puerto ${PORT}`);
 });
