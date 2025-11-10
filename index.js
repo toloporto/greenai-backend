@@ -1,11 +1,5 @@
 # Estás en C:\greenai-backend
-# Verifica el contenido actual (debe mostrar el comentario malo)
-Get-Content "index.js" -Head 3
-
-# Borra el archivo roto
-Remove-Item "index.js" -Force
-
-# Crea NUEVO index.js 100% LIMPIO (SIN comentarios)
+# Actualiza index.js con fix para Railway (usa process.env.PORT SIEMPRE)
 @'
 require("dotenv").config();
 const express = require("express");
@@ -21,16 +15,17 @@ try {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL
   });
-  console.log("DB connected");
+  console.log("DB connected successfully");
 } catch (e) {
   console.error("DB Connection failed:", e.message);
 }
 
 app.get("/", (req, res) => {
   res.json({ 
-    message: "GreenAI Backend EN VIVO!", 
+    message: "GreenAI Backend EN VIVO!",
     dbConnected: !!pool,
-    api: "/api/zones"
+    api: "/api/zones",
+    port: process.env.PORT || 4000
   });
 });
 
@@ -49,6 +44,7 @@ app.get("/api/zones", async (req, res) => {
     const result = await pool.query("SELECT * FROM zones ORDER BY created_at DESC");
     res.json(result.rows);
   } catch (e) {
+    console.error("Query error:", e);
     res.status(500).json({ error: e.message });
   }
 });
@@ -64,17 +60,16 @@ app.post("/api/zones", async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (e) {
+    console.error("Insert error:", e);
     res.status(500).json({ error: e.message });
   }
 });
 
+// FIX PARA RAILWAY: Usa process.env.PORT SIEMPRE
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend en puerto ${PORT}`);
 });
 '@ | Out-File -FilePath "index.js" -Encoding ASCII
 
-Write-Host "index.js LIMPIO Y CORRECTO!" -ForegroundColor Green
-
-# Verifica el nuevo contenido (debe empezar con require)
-Get-Content "index.js" -Head 3
+Write-Host "index.js actualizado para Railway (PORT fix)!" -ForegroundColor Green
