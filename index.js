@@ -1,3 +1,12 @@
+# Estás en C:\greenai-backend
+# Verifica el contenido actual (debe mostrar el comentario malo)
+Get-Content "index.js" -Head 3
+
+# Borra el archivo roto
+Remove-Item "index.js" -Force
+
+# Crea NUEVO index.js 100% LIMPIO (SIN comentarios)
+@'
 require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
@@ -33,7 +42,7 @@ app.get("/api/zones", async (req, res) => {
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         area REAL DEFAULT 100,
-        cover TEXT DEFAULT 'pl?stico',
+        cover TEXT DEFAULT 'plástico',
         created_at TIMESTAMP DEFAULT NOW()
       );
     `);
@@ -63,3 +72,9 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend en puerto ${PORT}`);
 });
+'@ | Out-File -FilePath "index.js" -Encoding ASCII
+
+Write-Host "index.js LIMPIO Y CORRECTO!" -ForegroundColor Green
+
+# Verifica el nuevo contenido (debe empezar con require)
+Get-Content "index.js" -Head 3
