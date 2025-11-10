@@ -1,7 +1,4 @@
-# Estás en C:\greenai-backend
-# Actualiza index.js con fix para Railway (usa process.env.PORT SIEMPRE)
-@'
-require("dotenv").config();
+﻿require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
@@ -13,7 +10,8 @@ app.use(express.json());
 let pool;
 try {
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
   });
   console.log("DB connected successfully");
 } catch (e) {
@@ -65,11 +63,7 @@ app.post("/api/zones", async (req, res) => {
   }
 });
 
-// FIX PARA RAILWAY: Usa process.env.PORT SIEMPRE
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend en puerto ${PORT}`);
 });
-'@ | Out-File -FilePath "index.js" -Encoding ASCII
-
-Write-Host "index.js actualizado para Railway (PORT fix)!" -ForegroundColor Green
