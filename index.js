@@ -1,9 +1,3 @@
-﻿# Estás en C:\greenai-backend
-# Borra el archivo roto
-Remove-Item "index.js" -Force
-
-# Crea NUEVO index.js CORRECTO (100% JavaScript)
-$indexContent = @'
 require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
@@ -39,7 +33,7 @@ app.get("/api/zones", async (req, res) => {
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         area REAL DEFAULT 100,
-        cover TEXT DEFAULT 'plástico',
+        cover TEXT DEFAULT 'pl?stico',
         created_at TIMESTAMP DEFAULT NOW()
       );
     `);
@@ -69,8 +63,3 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend en puerto ${PORT}`);
 });
-'@
-
-$indexContent | Out-File -FilePath "index.js" -Encoding ASCII
-
-Write-Host "index.js CORREGIDO (sin comentarios PowerShell)!" -ForegroundColor Green
